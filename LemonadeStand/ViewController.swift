@@ -14,9 +14,8 @@ class ViewController: UIViewController {
 	@IBOutlet weak var playerLemonLabel: UILabel!
 	@IBOutlet weak var playerIceLabel: UILabel!
 
-	var playerMoney = 10
-	var playerLemons = 1
-	var playerIce = 1
+	var supplies = Supplies(money: 10, lemons: 1, iceCubes: 1)
+	var price = Price()
 
 	@IBOutlet weak var shopLemonLabel: UILabel!
 	@IBOutlet weak var shopIceLabel: UILabel!
@@ -50,6 +49,8 @@ class ViewController: UIViewController {
 		warmWeather.customerBonus = 4
 		warmWeather.image = UIImage(named: "warmWeather")
 		weathers += [coldWeather, mildWeather, warmWeather]
+
+		updateView()
 	}
 
 	override func didReceiveMemoryWarning() {
@@ -58,42 +59,50 @@ class ViewController: UIViewController {
 	}
 
 	@IBAction func buyLemonsButton(sender: UIButton) {
-		if playerMoney >= 2 {
-			playerMoney -= 2
-			playerLemons++
+		if supplies.money >= 2 {
+			supplies.money -= 2
+			supplies.lemons++
 			shopLemons++
+		} else {
+			showAlertWithText(header: "You're broke!", message: "You can't afford a lemon.")
 		}
 		updateView()
 	}
 	@IBAction func sellLemonsButton(sender: UIButton) {
-		if playerLemons > 0 {
-			playerLemons--
+		if supplies.lemons > 0 {
+			supplies.lemons--
 			shopLemons--
-			playerMoney += 2
+			supplies.money += 2
+		} else {
+			showAlertWithText(header: "No lemons, dude.", message: "You can't sell a lemon you don't have.")
 		}
 		updateView()
 	}
 
 	@IBAction func buyIceButton(sender: UIButton) {
-		if playerMoney >= 1 {
-			playerMoney--
-			playerIce++
+		if supplies.money >= 1 {
+			supplies.money--
+			supplies.iceCubes++
 			shopIce++
+		} else {
+			showAlertWithText(header: "You're broke!", message: "You can't even afford an ice cube. Sucks for you, man.")
 		}
 		updateView()
 	}
 	@IBAction func sellIceButton(sender: UIButton) {
-		if playerIce > 0 {
-			playerIce--
+		if supplies.iceCubes > 0 {
+			supplies.iceCubes--
 			shopIce--
-			playerMoney++
+			supplies.money++
+		} else {
+			showAlertWithText(header: "Nah, man.", message: "How you gonna sell ice if you don't have no ice?")
 		}
 		updateView()
 	}
 
 	@IBAction func addLemonsButton(sender: UIButton) {
-		if playerLemons > 0 {
-			playerLemons--
+		if supplies.lemons > 0 {
+			supplies.lemons--
 			shopLemons--
 			mixLemons++
 		}
@@ -102,15 +111,15 @@ class ViewController: UIViewController {
 	@IBAction func removeLemonsButton(sender: UIButton) {
 		if mixLemons > 0 {
 			mixLemons--
-			playerLemons++
+			supplies.lemons++
 			shopLemons++
 		}
 		updateView()
 	}
 
 	@IBAction func addIceButton(sender: UIButton) {
-		if playerIce > 0 {
-			playerIce--
+		if supplies.iceCubes > 0 {
+			supplies.iceCubes--
 			shopIce--
 			mixIce++
 		}
@@ -119,7 +128,7 @@ class ViewController: UIViewController {
 	@IBAction func removeIceButton(sender: UIButton) {
 		if mixIce > 0 {
 			mixIce--
-			playerIce++
+			supplies.iceCubes++
 			shopIce++
 		}
 		updateView()
@@ -162,7 +171,7 @@ class ViewController: UIViewController {
 			mixIce = 0
 
 			// Give the player the money and display how much the player earned today.
-			playerMoney += moneyEarned
+			supplies.money += moneyEarned
 			customerSatisfactionLabel.hidden = false
 			customerSatisfactionLabel.text = "You made $\(moneyEarned) today with \(numberOfCustomers) happy customers!"
 			moneyEarned = 0
@@ -172,21 +181,27 @@ class ViewController: UIViewController {
 	}
 
 	func updateView() {
-		playerMoneyLabel.text = "$\(playerMoney)"
-		if playerLemons == 1 {
-			playerLemonLabel.text = "\(playerLemons) Lemon"
+		playerMoneyLabel.text = "$\(supplies.money)"
+		if supplies.lemons == 1 {
+			playerLemonLabel.text = "\(supplies.lemons) Lemon"
 		} else {
-			playerLemonLabel.text = "\(playerLemons) Lemons"
+			playerLemonLabel.text = "\(supplies.lemons) Lemons"
 		}
-		if playerIce == 1 {
-			playerIceLabel.text = "\(playerIce) Ice Cube"
+		if supplies.iceCubes == 1 {
+			playerIceLabel.text = "\(supplies.iceCubes) Ice Cube"
 		} else {
-			playerIceLabel.text = "\(playerIce) Ice Cubes"
+			playerIceLabel.text = "\(supplies.iceCubes) Ice Cubes"
 		}
 		shopLemonLabel.text = "\(shopLemons)"
 		shopIceLabel.text = "\(shopIce)"
 		mixLemonLabel.text = "\(mixLemons)"
 		mixIceLabel.text = "\(mixIce)"
+	}
+
+	func showAlertWithText(header: String = "Warning", message: String) {
+		var alert = UIAlertController(title: header, message: message, preferredStyle: UIAlertControllerStyle.Alert)
+		alert.addAction(UIAlertAction(title: "Ok", style: UIAlertActionStyle.Default, handler: nil))
+		self.presentViewController(alert, animated: true, completion: nil)
 	}
 }
 

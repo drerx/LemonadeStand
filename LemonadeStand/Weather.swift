@@ -10,7 +10,6 @@ import Foundation
 import UIKit
 
 struct Weather {
-
 	var customerBonus = 0
 	var image = UIImage(named: "coldWeather")
 }
